@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OctoSphere - Desarrollo Digital</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';">
+    <style>
+        /* --- Configuración Base y Fondo --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0093E9 0%, #80D0C7 50%, #ffffff 100%);
+            color: #1d1d1f;
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* --- Elementos Flotantes de Fondo (Se mueven a la derecha) --- */
+        .decoraciones {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: -80px;
+            pointer-events: none;
+            z-index: 1;
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .simbolo {
+            position: absolute;
+            left: -60px;
+            font-weight: bold;
+            animation: moverDerecha 22s linear infinite; 
+        }
+
+        @keyframes moverDerecha {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 120px)); }
+        }
+
+        .simbolo-1  { top: 12%; animation-delay: -2s;  font-size: 3rem; }
+        .simbolo-2  { top: 25%; animation-delay: -14s; }
+        .simbolo-3  { top: 40%; animation-delay: -8s;  font-size: 4rem; }
+        .simbolo-4  { bottom: 30%; animation-delay: -18s; }
+        .simbolo-5  { top: 30%; animation-delay: -5s;  font-size: 3.5rem; color: rgba(255, 255, 255, 0.25); }
+        .simbolo-6  { top: 8%;  animation-delay: -11s; font-size: 4rem; opacity: 0.3; }
+        .simbolo-7  { bottom: 25%; animation-delay: -4s; font-size: 3rem; opacity: 0.35; }
+        .simbolo-8  { bottom: 20%; animation-delay: -16s; font-size: 4rem; opacity: 0.25; }
+        .simbolo-9  { top: 50%; animation-delay: -9s;  font-size: 3rem; opacity: 0.4; }
+        .simbolo-10 { bottom: 15%; animation-delay: -20s; font-size: 3.5rem; opacity: 0.2; }
+        .simbolo-11 { top: 60%; animation-delay: -13s; font-size: 4rem; opacity: 0.2; }
+        .simbolo-12 { top: 75%; animation-delay: -7s;  font-size: 3.5rem; opacity: 0.3; }
+
+        /* --- Header y Logo --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 5%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-pulpo {
+            width: 50px;
+            height: 50px;
+            fill: #ffffff;
+        }
+
+        .logo-texto h1 {
+            font-size: 1.5rem;
+            color: #ffffff;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+
+        .logo-texto span {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+
+        /* --- Navegación Animada --- */
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.3s;
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #9b51e0, #f2c94c, #9b51e0);
+            background-size: 200% auto;
+            animation: gradienteLinea 3s linear infinite;
+        }
+
+        @keyframes gradienteLinea {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        /* --- Contenedor Principal y Control de Vistas --- */
+        main {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+
+        .vista-seccion {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .vista-seccion.activa {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 30px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Carrusel Infinito de Plantillas en Inicio (Se mueve a la izquierda) --- */
+        #inicio.vista-seccion.activa {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            overflow: hidden;
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        .inicio-intro {
+            text-align: center;
+            color: #ffffff;
+            max-width: 650px;
+        }
+
+        .inicio-intro h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .inicio-intro p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .carrusel-contenedor {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            padding: 15px 0;
+            -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+        }
+
+        .carrusel-pista {
+            display: flex;
+            gap: 28px;
+            width: max-content;
+            animation: deslizarIzquierda 38s linear infinite;
+        }
+
+        .carrusel-contenedor:hover .carrusel-pista {
+            animation-play-state: paused;
+        }
+
+        @keyframes deslizarIzquierda {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .plantilla-card {
+            width: 340px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 24px;
+            padding: 14px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            color: #ffffff;
+            transition: transform 0.3s ease;
+        }
+
+        .plantilla-card:hover {
+            transform: translateY(-6px);
+        }
+
+        .plantilla-card img {
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+            border-radius: 16px;
+            display: block;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .plantilla-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 6px;
+        }
+
+        .plantilla-info h4 {
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .plantilla-tag {
+            font-size: 0.78rem;
+            padding: 4px 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.25);
+            font-weight: 500;
+        }
+
+        /* --- Tarjetas Estilo Apple --- */
+        .card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 28px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            color: #ffffff;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
+        }
+
+        .card-it   { background: rgba(255, 159, 67, 0.2); }
+        .card-web  { background: rgba(0, 147, 233, 0.25); }
+        .card-apps { background: rgba(46, 204, 113, 0.2); }
+        .card-ui   { background: rgba(155, 81, 224, 0.2); }
+
+        .card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.5;
+        }
+
+        /* --- Lista dentro de Servicios --- */
+        .lista-servicios {
+            list-style: none;
+            margin-top: 18px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .lista-servicios li {
+            font-size: 0.92rem;
+            margin-bottom: 10px;
+            padding-left: 18px;
+            position: relative;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .lista-servicios li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #f2c94c;
+            font-weight: bold;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        /* --- Estilos del Formulario de Contacto --- */
+        .card-contacto {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .form-grupo {
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .form-grupo label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #ffffff;
+        }
+
+        .form-grupo input,
+        .form-grupo textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        .form-grupo input::placeholder,
+        .form-grupo textarea::placeholder {
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        .form-grupo input:focus,
+        .form-grupo textarea:focus {
+            border-color: #f2c94c;
+            background: rgba(255, 255, 255, 0.28);
+        }
+
+        .btn-enviar {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(90deg, #9b51e0, #0093E9);
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-enviar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- Footer (Bloque de Contacto Arena y Redes) --- */
+        footer {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .contacto-box {
+            background-color: #e5d3b3;
+            color: #4a3f35;
+            width: 100%;
+            max-width: 900px;
+            padding: 25px 40px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .contacto-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .contacto-datos {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .contacto-datos span {
+            font-weight: 500;
+        }
+
+        .redes-sociales {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-red {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 12px;
+            background-color: #4a3f35;
+            color: #e5d3b3;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .btn-red:hover {
+            transform: translateY(-2px);
+            background-color: #2c251f;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="decoraciones">
+        <div class="simbolo simbolo-1">( )</div>
+        <div class="simbolo simbolo-2">;</div>
+        <div class="simbolo simbolo-3">↗</div>
+        <div class="simbolo simbolo-5">⬉</div>
+        <div class="simbolo simbolo-6">⬋</div>
+        <div class="simbolo simbolo-7">*</div>
+        <div class="simbolo simbolo-8">/</div>
+        <div class="simbolo simbolo-9">{ }</div>
+        <div class="simbolo simbolo-10">[ ]</div>
+        <div class="simbolo simbolo-11">&lt; &gt;</div>
+        <div class="simbolo simbolo-12">#</div>
+    </div>
+
+    <header>
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo OctoSphere" class="logo-pulpo">
+            <div class="logo-texto">
+                <h1>OctoSphere</h1>
+                <span>Desarrollo Digital</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#inicio" class="active" onclick="cambiarPantalla(event, 'inicio', this)">Inicio</a></li>
+                <li><a href="#servicios" onclick="cambiarPantalla(event, 'servicios', this)">Servicios</a></li>
+                <li><a href="#portafolio" onclick="cambiarPantalla(event, 'portafolio', this)">Portafolio</a></li>
+                <li><a href="#nosotros" onclick="cambiarPantalla(event, 'nosotros', this)">Nosotros</a></li>
+                <li><a href="#contacto" onclick="cambiarPantalla(event, 'contacto', this)">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- SECCIÓN 1: INICIO (Carrusel de plantillas hacia la izquierda) -->
+        <div id="inicio" class="vista-seccion activa">
+            <div class="inicio-intro">
+                <h2>Diseños que impulsan tu marca</h2>
+                <p>Explora algunas de nuestras plantillas y soluciones digitales listas para adaptarse a tu negocio.</p>
+            </div>
+
+            <div class="carrusel-contenedor">
+                <div class="carrusel-pista">
+                    <!-- GRUPO ORIGINAL DE PLANTILLAS -->
+                    <div class="plantilla-card">
+                        <img src="plantilla.jpg" alt="Plantilla E-Commerce">
+                        <div class="plantilla-info">
+                            <h4>Tienda Online Pro</h4>
+                            <span class="plantilla-tag">E-Commerce</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla1.jpg" alt="Plantilla Restaurante">
+                        <div class="plantilla-info">
+                            <h4>Menú & Reservas</h4>
+                            <span class="plantilla-tag">Gastronomía</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla2.avif" alt="Plantilla Corporativa">
+                        <div class="plantilla-info">
+                            <h4>Agencia & Consultoría</h4>
+                            <span class="plantilla-tag">Corporativo</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla3.jpg" alt="Plantilla Dashboard">
+                        <div class="plantilla-info">
+                            <h4>Panel Administrativo</h4>
+                            <span class="plantilla-tag">Sistema Web</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla4.jpg" alt="Plantilla Blog Personal">
+                        <div class="plantilla-info">
+                            <h4>Blog Personal</h4>
+                            <span class="plantilla-tag">Contenido</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla5.jpg" alt="Plantilla Portafolio Creativo">
+                        <div class="plantilla-info">
+                            <h4>Portafolio Creativo</h4>
+                            <span class="plantilla-tag">Diseño</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla6.jpg" alt="Plantilla SaaS">
+                        <div class="plantilla-info">
+                            <h4>Software as a Service</h4>
+                            <span class="plantilla-tag">SaaS</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla7.png" alt="Plantilla Educativa">
+                        <div class="plantilla-info">
+                            <h4>Plataforma Educativa</h4>
+                            <span class="plantilla-tag">Educativo</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla8.jpg" alt="Plantilla Portfolio Fotografía">
+                        <div class="plantilla-info">
+                            <h4>Portfolio Fotografía</h4>
+                            <span class="plantilla-tag">Fotografía</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla9.jpg" alt="Plantilla Agencia Creativa">
+                        <div class="plantilla-info">
+                            <h4>Agencia Creativa</h4>
+                            <span class="plantilla-tag">Marketing</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla10.jpg" alt="Plantilla Blog de Viajes">
+                        <div class="plantilla-info">
+                            <h4>Blog de Viajes</h4>
+                            <span class="plantilla-tag">Viajes</span>
+                        </div>
+                    </div>
+
+                    <!-- DUPLICADO EXACTO (Para bucle infinito continuo sin cortes) -->
+                    <div class="plantilla-card">
+                        <img src="plantilla.jpg" alt="Plantilla E-Commerce">
+                        <div class="plantilla-info">
+                            <h4>Tienda Online Pro</h4>
+                            <span class="plantilla-tag">E-Commerce</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla1.jpg" alt="Plantilla Restaurante">
+                        <div class="plantilla-info">
+                            <h4>Menú & Reservas</h4>
+                            <span class="plantilla-tag">Gastronomía</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla2.avif" alt="Plantilla Corporativa">
+                        <div class="plantilla-info">
+                            <h4>Agencia & Consultoría</h4>
+                            <span class="plantilla-tag">Corporativo</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla3.jpg" alt="Plantilla Dashboard">
+                        <div class="plantilla-info">
+                            <h4>Panel Administrativo</h4>
+                            <span class="plantilla-tag">Sistema Web</span>
+                        </div>
+                    </div>
+                    <div class="plantilla-card">
+                        <img src="plantilla4.jpg" alt="Plantilla Blog Personal">
+                        <div class="plantilla-info">
+                            <h4>Blog Personal</h4>
+                            <span class="plantilla-tag">Contenido</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla5.jpg" alt="Plantilla Portafolio Creativo">
+                        <div class="plantilla-info">
+                            <h4>Portafolio Creativo</h4>
+                            <span class="plantilla-tag">Diseño</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla6.jpg" alt="Plantilla SaaS">
+                        <div class="plantilla-info">
+                            <h4>Software as a Service</h4>
+                            <span class="plantilla-tag">SaaS</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla7.png" alt="Plantilla Educativa">
+                        <div class="plantilla-info">
+                            <h4>Plataforma Educativa</h4>
+                            <span class="plantilla-tag">Educativo</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla8.jpg" alt="Plantilla Portfolio Fotografía">
+                        <div class="plantilla-info">
+                            <h4>Portfolio Fotografía</h4>
+                            <span class="plantilla-tag">Fotografía</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla9.jpg" alt="Plantilla Agencia Creativa">
+                        <div class="plantilla-info">
+                            <h4>Agencia Creativa</h4>
+                            <span class="plantilla-tag">Marketing</span>
+                        </div>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <img src="plantilla10.jpg" alt="Plantilla Blog de Viajes">
+                        <div class="plantilla-info">
+                            <h4>Blog de Viajes</h4>
+                            <span class="plantilla-tag">Viajes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: SERVICIOS -->
+        <div id="servicios" class="vista-seccion">
+            <div class="card card-it">
+                <h3>Servicios IT</h3>
+                <p>Mantenimiento preventivo, seguridad y asistencia técnica para tu infraestructura tecnológica.</p>
+                <ul class="lista-servicios">
+                    <li>Mantenimiento de servidores y hosting</li>
+                    <li>Copias de seguridad (Backups) y recuperación de datos</li>
+                    <li>Ciberseguridad y certificados SSL</li>
+                    <li>Soporte técnico remoto y monitoreo 24/7</li>
+                </ul>
+            </div>
+            <div class="card card-web">
+                <h3>Desarrollo Web</h3>
+                <p>Soluciones a medida para presencia digital y comercio electrónico.</p>
+                <ul class="lista-servicios">
+                    <li>Landing Pages de alta conversión</li>
+                    <li>Tiendas en línea (E-commerce)</li>
+                    <li>Sistemas Web y Dashboards a medida</li>
+                    <li>Optimización SEO técnico y velocidad</li>
+                </ul>
+            </div>
+
+            <div class="card card-apps">
+                <h3>Aplicaciones Móviles</h3>
+                <p>Experiencias nativas fluidas para ecosistemas iOS y Android.</p>
+                <ul class="lista-servicios">
+                    <li>Apps multiplataforma (React Native / Flutter)</li>
+                    <li>Integración con pasarelas de pago</li>
+                    <li>Notificaciones Push en tiempo real</li>
+                    <li>Publicación en App Store y Google Play</li>
+                </ul>
+            </div>
+
+            <div class="card card-ui">
+                <h3>Diseño UI/UX & Marca</h3>
+                <p>Identidad visual y prototipado centrado en la experiencia del usuario.</p>
+                <ul class="lista-servicios">
+                    <li>Diseño de interfaces en Figma</li>
+                    <li>Prototipos interactivos navegables</li>
+                    <li>Rediseño de plataformas existentes</li>
+                    <li>Sistemas de diseño (Design Systems)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: PORTAFOLIO -->
+        <div id="portafolio" class="vista-seccion">
+            <div class="card card-web">
+                <h3>E-Commerce Minimal</h3>
+                <p>Plataforma de ventas con pasarela de pagos integrada y tiempos de carga menores a 1 segundo.</p>
+            </div>
+            <div class="card card-apps">
+                <h3>App de Finanzas</h3>
+                <p>Aplicación móvil con gráficos interactivos en tiempo real y autenticación biométrica.</p>
+            </div>
+            <div class="card card-ui">
+                <h3>Rediseño SaaS</h3>
+                <p>Sistema de diseño completo y panel administrativo enfocado en productividad.</p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: NOSOTROS -->
+        <div id="nosotros" class="vista-seccion">
+            <div class="card">
+                <h3>Sobre OctoSphere</h3>
+                <p>Somos un estudio de desarrollo digital enfocado en combinar arquitectura de software sólida con interfaces limpias, fluidas y memorables.</p>
+            </div>
+            <div class="card card-web">
+                <h3>Nuestra Metodología</h3>
+                <p>Trabajamos con ciclos ágiles, entregas continuas y comunicación directa para transformar ideas en productos digitales funcionales.</p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 5: CONTACTO -->
+        <div id="contacto" class="vista-seccion">
+            <div class="card card-contacto">
+                <h3>Hablemos de tu proyecto</h3>
+                <p style="margin-bottom: 20px;">Déjanos tus datos y nos pondremos en contacto contigo a la brevedad.</p>
+                
+                <form id="formContacto" onsubmit="enviarFormulario(event)">
+    <!-- Campo trampa invisible para bots -->
+    <input type="text" id="website_url" name="website_url" style="display:none;" tabindex="-1" autocomplete="off">
+
+    <div class="form-grupo">
+        <label for="whatsapp">Número de WhatsApp:</label>
+        <input type="tel" id="whatsapp" name="whatsapp" maxlength="20" placeholder="Ej. +52 55 1234 5678" required>
+    </div>
+
+    <div class="form-grupo">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" maxlength="60" placeholder="Tu nombre o el de tu empresa" required>
+    </div>
+
+    <div class="form-grupo">
+        <label for="giro">Giro de tu negocio:</label>
+        <input type="text" id="giro" name="giro" maxlength="80" placeholder="Ej. Restaurante, Tienda de ropa, Clínica..." required>
+    </div>
+
+    <div class="form-grupo">
+        <label for="objetivo">Objetivo:</label>
+        <textarea id="objetivo" name="objetivo" rows="3" maxlength="350" placeholder="Cuéntanos qué quieres lograr..." required></textarea>
+    </div>
+
+    <button type="submit" class="btn-enviar">Enviar información</button>
+</form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="contacto-box">
+            <div class="contacto-info">
+                <h4>Contacto</h4>
+                <p>¿Tienes un proyecto en mente? Hablemos.</p>
+            </div>
+            <div class="contacto-datos">
+                <p>Email: <span>info@octosphere.com</span></p>
+                <p>Tel: <span>+52 56 4540 8382</span></p>
+                <div class="redes-sociales">
+                    <a href="https://instagram.com/octosphere5/" target="_blank" rel="noopener noreferrer" class="btn-red">Instagram</a>
+                    <a href="https://www.facebook.com/profile.php?id=61581854714784" target="_blank" rel="noopener noreferrer" class="btn-red">Facebook</a>
+                    <a href="https://tiktok.com/@octosphere5" target="_blank" rel="noopener noreferrer" class="btn-red">TikTok</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function cambiarPantalla(event, idSeccion, elementoClickeado) {
+            event.preventDefault();
+
+            const secciones = document.querySelectorAll('.vista-seccion');
+            secciones.forEach(sec => sec.classList.remove('activa'));
+
+            const seccionDestino = document.getElementById(idSeccion);
+            if (seccionDestino) {
+                seccionDestino.classList.add('activa');
+            }
+
+            const enlaces = document.querySelectorAll('nav a');
+            enlaces.forEach(enlace => enlace.classList.remove('active'));
+            elementoClickeado.classList.add('active');
+        }
+
+        function enviarFormulario(event) {
+    event.preventDefault();
+
+    // Si el campo oculto tiene texto, es un bot: detenemos el proceso
+    const trampaBot = document.getElementById('website_url').value;
+    if (trampaBot !== "") {
+        return;
+    }
+
+    // Sanitizamos y codificamos cada dato de forma segura
+    const whatsapp = encodeURIComponent(document.getElementById('whatsapp').value.trim());
+    const nombre   = encodeURIComponent(document.getElementById('nombre').value.trim());
+    const giro     = encodeURIComponent(document.getElementById('giro').value.trim());
+    const objetivo = encodeURIComponent(document.getElementById('objetivo').value.trim());
+
+    const telefonoDestino = "525645408382";
+    const texto = `Hola%20OctoSphere,%20me%20gustar%C3%ADa%20cotizar%20un%20proyecto:%0A%0A` +
+                  `*Nombre:*%20${nombre}%0A` +
+                  `*WhatsApp:*%20${whatsapp}%0A` +
+                  `*Giro%20del%20negocio:*%20${giro}%0A` +
+                  `*Objetivo:*%20${objetivo}`;
+
+    window.open(`https://wa.me/${telefonoDestino}?text=${texto}`, '_blank', 'noopener,noreferrer');
+    event.target.reset();
+}
+    </script>
+
+</body>
+</html>
