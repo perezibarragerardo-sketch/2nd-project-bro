@@ -453,6 +453,56 @@
             transform: translateY(-2px);
             background-color: #2c251f;
         }
+
+        /* --- Bloqueo estricto de desbordamiento horizontal en móviles --- */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* --- Ajustes Responsivos para Celulares y Tablets --- */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 18px;
+        padding: 20px 15px;
+    }
+
+    nav ul {
+        gap: 14px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    nav a {
+        font-size: 0.92rem;
+    }
+
+    .inicio-intro h2 {
+        font-size: 1.5rem;
+        padding: 0 10px;
+    }
+
+    .inicio-intro p {
+        font-size: 0.9rem;
+        padding: 0 15px;
+    }
+
+    .plantilla-card {
+        width: 280px;
+    }
+
+    .contacto-box {
+        padding: 20px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .contacto-datos {
+        justify-content: center;
+        gap: 12px;
+    }
+}
     </style>
 </head>
 <body>
